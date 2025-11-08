@@ -17,13 +17,13 @@ public class Lwjgl3Launcher {
 
     private static Lwjgl3ApplicationConfiguration getDefaultConfiguration() {
         Lwjgl3ApplicationConfiguration configuration = new Lwjgl3ApplicationConfiguration();
-        configuration.setTitle("RedCorpseCorporation");
+        configuration.setTitle("RedCorpseCorporation-Server");
 
         configuration.useVsync(true);
         configuration.setResizable(false);
         configuration.setForegroundFPS(60);
 
-        configuration.setWindowedMode(1920, 1080);
+        configuration.setWindowedMode(1800, 900);
         configuration.setWindowIcon("libgdx128.png", "libgdx64.png", "libgdx32.png", "libgdx16.png");
 
         return configuration;

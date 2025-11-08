@@ -6,6 +6,7 @@ import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -15,6 +16,7 @@ import Pantallas.PantallaCarga;
 import Utiles.Animaciones;
 import Utiles.Imagen;
 import Utiles.Render;
+import redServer.HiloServidor;
 import sonidos.SonidoMenuPrincipal;
 
 public class MenuPrincipal implements Screen {
@@ -22,6 +24,8 @@ public class MenuPrincipal implements Screen {
     private final Game game;
     private SpriteBatch batch;
 
+    static private boolean conectado=false;
+    
     private Imagen fondo;
     private Imagen botonJugar;
     private Imagen botonOpciones;
@@ -31,6 +35,8 @@ public class MenuPrincipal implements Screen {
     private float anchoBoton = 309, altoBoton = 115;
 
     SonidoMenuPrincipal sonidoMenuPrincipalHilo;
+    
+    HiloServidor hiloServidor;
     
     private Screen pantallaAnterior;
     private boolean pausa = false;
@@ -44,6 +50,7 @@ public class MenuPrincipal implements Screen {
 
     // mouse en coordenadas virtuales
     private float mouseX, mouseY;
+	private BitmapFont bitmapFont;
 
     private static final float VIRTUAL_WIDTH = 1920;
     private static final float VIRTUAL_HEIGHT = 1080;
@@ -62,6 +69,13 @@ public class MenuPrincipal implements Screen {
     public void show() {
         batch = Render.batch;
 
+        this.bitmapFont = new BitmapFont();
+        
+        if (hiloServidor == null) {
+            hiloServidor = new HiloServidor();
+            hiloServidor.start();
+        }
+        
         fondo = new Imagen("FondoCarga.jpg");
         botonJugar = new Imagen("jugarBoton.png");
         botonOpciones = new Imagen("opcionesBoton.png");
@@ -82,6 +96,7 @@ public class MenuPrincipal implements Screen {
         yBotonJugar = 600f;
         yBotonOpciones = 400f;
         yBotonSalir = 200f;
+
     }
 
     @Override
@@ -105,6 +120,9 @@ public class MenuPrincipal implements Screen {
         boolean hoverOpciones = Animaciones.animarHover(batch, botonOpciones, xBoton, yBotonOpciones, anchoBoton, altoBoton, mouseX, mouseY, 1.1f, 10f, delta);
         boolean hoverSalir = Animaciones.animarHover(batch, botonSalir, xBoton, yBotonSalir, anchoBoton, altoBoton, mouseX, mouseY, 1.1f, 10f, delta);
 
+        bitmapFont.draw(batch, "Conectados al server: " + hiloServidor.getCantClientes(), 20f, camera.viewportHeight - 20f);
+
+        
         batch.end();
 
         if (Gdx.input.justTouched() && Gdx.input.isButtonPressed(Buttons.LEFT)) {
@@ -117,6 +135,8 @@ public class MenuPrincipal implements Screen {
             } else if (hoverOpciones) {
                 game.setScreen(new MenuOpciones(game, this));
             } else if (hoverSalir) {
+            	
+            	hiloServidor.cerrarConexion();
                 Gdx.app.exit();
             }
         }
