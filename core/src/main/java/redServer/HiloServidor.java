@@ -5,7 +5,13 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
-import java.net.UnknownHostException;
+import java.util.ArrayList;
+
+import Entidades.Entidad;
+import Entidades.Jugador;
+import Utiles.Headless;
+import cartas.Carta;
+import juegos.Juego;
 
 public class HiloServidor extends Thread{
 	
@@ -17,6 +23,10 @@ public class HiloServidor extends Thread{
 	
 	private boolean[] clientesListos = new boolean[2];
 	private int cantListos = 0;
+	
+    private Juego juegoServidor;
+	
+	private boolean partidaIniciada = false;
 
 	
 	public HiloServidor() {
@@ -63,43 +73,105 @@ public class HiloServidor extends Thread{
 
 	            clientes[cantClientes] = new DireccionRed(dp.getAddress(), dp.getPort());
 
-	            enviarMensaje("OK", clientes[cantClientes].getIp(), clientes[cantClientes].getPuerto());
+	            enviarMensaje("OK",
+	                    clientes[cantClientes].getIp(),
+	                    clientes[cantClientes].getPuerto());
 
 	            cantClientes++;
-
-	            // Avisar a todos los que están conectados cuántos jugadores hay
-	            for (int i = 0; i < cantClientes; i++) {
-	                enviarMensaje("Jugadores:" + cantClientes,
-	                        clientes[i].getIp(),
-	                        clientes[i].getPuerto());
-	            }
+	            System.out.println("Total de clientes conectados: " + cantClientes);
 	        }
 
 	    } else if (msg.equals("Listo")) {
+	        // 🔹 Alguien apretó LISTO en la SalaDeEspera / Juego
 
-	        // Ver qué cliente mandó "Listo"
-	        for (int i = 0; i < cantClientes; i++) {
-	            if (clientes[i].getIp().equals(dp.getAddress())
-	                    && clientes[i].getPuerto() == dp.getPort()) {
-
-	                if (!clientesListos[i]) {
-	                    clientesListos[i] = true;
-	                    cantListos++;
-	                    System.out.println("Cliente " + i + " puso LISTO. Total listos: " + cantListos);
-	                }
-	                break;
-	            }
+	        int indice = buscarIndiceCliente(dp.getAddress(), dp.getPort());
+	        if (indice != -1 && !clientesListos[indice]) {
+	            clientesListos[indice] = true;
+	            cantListos++;
+	            System.out.println("Cliente " + indice + " está LISTO. Total listos: " + cantListos);
 	        }
 
-	        // Si hay 2 conectados y los 2 pusieron listo -> Empieza
+	        // Cuando los 2 están conectados y listos → creamos la partida
 	        if (cantClientes == 2 && cantListos == 2) {
+	            System.out.println("Ambos clientes conectados y listos. Iniciando partida...");
+	            iniciarPartidaEnServidor();
+
+	            // Avisar a los clientes que la partida arranca (para que cambien de pantalla)
 	            enviarMensaje("Empieza", clientes[0].getIp(), clientes[0].getPuerto());
 	            enviarMensaje("Empieza", clientes[1].getIp(), clientes[1].getPuerto());
-	            System.out.println("Todos listos, empieza la partida.");
 	        }
 	    }
 	}
 
+	
+	private int buscarIndiceCliente(InetAddress ip, int puerto) {
+	    for (int i = 0; i < cantClientes; i++) {
+	        if (clientes[i].getIp().equals(ip) && clientes[i].getPuerto() == puerto) {
+	            return i;
+	        }
+	    }
+	    return -1;
+	}
+	
+	private void iniciarPartidaEnServidor() {
+		
+		Headless.activar(); 
+	    // 1) Crear la lista de entidades (jugadores) que van a jugar
+	    ArrayList<Entidad> jugadores = new ArrayList<>();
+
+	    // Ojo: este constructor de Jugador lo deduzco de PantallaCarga:
+	    // new Jugador("Entidad 1", 100, personajesAnimados[1]);
+	    // En el servidor no nos importa el sprite → le mandamos null
+	    Entidad entidad1 = new Jugador("Entidad 1", 100, null);
+	    Entidad entidad2 = new Jugador("Entidad 2", 100, null);
+
+	    jugadores.add(entidad1);
+	    jugadores.add(entidad2);
+
+	    // 2) Crear el Juego del servidor
+	    //    Esto llama a iniciarMazo() y repartirCartas() dentro de Juego
+	    juegoServidor = new Juego(jugadores);
+
+	    System.out.println("[SERVIDOR] Juego creado. Mazo iniciado y cartas repartidas.");
+
+	    // 3) Mandar a cada cliente su entidad y su mano inicial
+	    for (int i = 0; i < cantClientes; i++) {
+	        enviarDatosInicialesAlCliente(i);
+	    }
+	}
+	
+	private void enviarDatosInicialesAlCliente(int indiceCliente) {
+	    Entidad jugador = juegoServidor.getJugador(indiceCliente);
+
+	    String nombreEntidad = jugador.getNombre();
+	    String manoSerializada = serializarMano(jugador);
+
+	    // Formato:
+	    // INIT;playerIndex;nombreEntidad;HAB1,HAB2,HAB3
+	    String mensaje = "INIT;" + indiceCliente + ";" + nombreEntidad + ";" + manoSerializada;
+
+	    System.out.println("[SERVIDOR] Enviando INIT a cliente " + indiceCliente + ": " + mensaje);
+
+	    enviarMensaje(mensaje,
+	            clientes[indiceCliente].getIp(),
+	            clientes[indiceCliente].getPuerto());
+	}
+
+	private String serializarMano(Entidad jugador) {
+	    StringBuilder sb = new StringBuilder();
+	    for (Carta c : jugador.getMano()) {
+	        if (sb.length() > 0) sb.append(",");
+
+	        sb.append(c.getId());
+	    }
+	    return sb.toString();
+	}
+
+
+
+	public boolean getPartidaIniciada() {
+		return this.partidaIniciada;
+	}
 	
 	public void cerrarConexion() {
 	    if (conexion != null && !conexion.isClosed()) {

@@ -252,6 +252,8 @@ public class Juego implements ControladorDeJuego, TiempoListener {
 	        System.out.println("Ya hay una carta en resolución. Esperá a que termine.");
 	        return;
 	    }
+	    jugador.getMano().remove(carta);
+	    
 	    this.cartaPendiente = carta;
 	    this.jugadorQueLaJugoPendiente = jugador;
 	    this.ticksPendientes = 45;

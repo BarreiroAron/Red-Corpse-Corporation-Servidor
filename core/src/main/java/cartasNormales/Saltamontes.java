@@ -15,7 +15,7 @@ public class Saltamontes extends Carta {
 	//Saltee el próximo turno del rival.
 	
 	public Saltamontes() {
-		super(0, 0, Habilidad.SALTEAR_TURNO, new Imagen(Recursos.SALTAMONTES), false, 0, 0, 
+		super("SALTAMONTES",0, 0, Habilidad.SALTEAR_TURNO, new Imagen(Recursos.SALTAMONTES), false, 0, 0, 
 				"Saltee el próximo turno del rival.",TipoDeCarta.NORMAL);
 	}
 	

@@ -1,5 +1,6 @@
 package Utiles;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -10,20 +11,25 @@ public class Imagen {
 		private Texture t;
 		private Sprite s;
 		
+		
 		public Imagen(String ruta) {
-			t = new Texture(ruta);
-			s = new Sprite(t);
-		}
+	        // 🚫 Si el server está headless, NO crees texturas
+	        if (Utiles.Headless.activo() || Gdx.app == null || Gdx.graphics == null) {
+	            this.t = null; // marcamos como “sin textura”
+	            return;
+	        }
+	        this.t = new Texture(ruta);
+	    }
+
+	    public void dibujar(SpriteBatch batch, float x, float y, float w, float h) {
+	        if (t == null) return; // en server no dibuja nada
+	        batch.draw(t, x, y, w, h);
+	    }
 		
 		public void dibujar() {
 			s.draw(Render.batch);
 		}
 		
-		public void dibujar(SpriteBatch batch, float x, float y, float width, float height) {
-		    s.setPosition(x, y);
-		    s.setSize(width, height);
-		    s.draw(batch);
-		}
 
 		public void setTransparencia(float f) {
 			s.setAlpha(f);

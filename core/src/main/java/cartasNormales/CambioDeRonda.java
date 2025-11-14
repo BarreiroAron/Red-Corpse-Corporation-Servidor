@@ -14,7 +14,7 @@ public class CambioDeRonda extends Carta {
 	private int puntosDisminuidos;
 	
 	public CambioDeRonda() {
-		super(0, 20, Habilidad.CAMBIO_DIRECCION, new Imagen(Recursos.CAMBIO_DE_RONDA), false, 0, 0, "Esta carta cambia la dirección de la ronda. Reduce 20 de tus puntos",TipoDeCarta.NORMAL);
+		super("CAMBIO_DE_RONDA",0, 20, Habilidad.CAMBIO_DIRECCION, new Imagen(Recursos.CAMBIO_DE_RONDA), false, 0, 0, "Esta carta cambia la dirección de la ronda. Reduce 20 de tus puntos",TipoDeCarta.NORMAL);
 	}
 	
 	@Override

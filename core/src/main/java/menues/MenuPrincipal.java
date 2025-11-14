@@ -24,6 +24,7 @@ public class MenuPrincipal implements Screen {
     private final Game game;
     private SpriteBatch batch;
 
+    
     static private boolean conectado=false;
     
     private Imagen fondo;
@@ -120,6 +121,10 @@ public class MenuPrincipal implements Screen {
         boolean hoverOpciones = Animaciones.animarHover(batch, botonOpciones, xBoton, yBotonOpciones, anchoBoton, altoBoton, mouseX, mouseY, 1.1f, 10f, delta);
         boolean hoverSalir = Animaciones.animarHover(batch, botonSalir, xBoton, yBotonSalir, anchoBoton, altoBoton, mouseX, mouseY, 1.1f, 10f, delta);
 
+        if(hiloServidor.getPartidaIniciada()) {
+        	hoverJugar=true;
+        }
+        
         bitmapFont.draw(batch, "Conectados al server: " + hiloServidor.getCantClientes(), 20f, camera.viewportHeight - 20f);
 
         
@@ -158,6 +163,7 @@ public class MenuPrincipal implements Screen {
         }
     }
 
+    
     @Override public void resize(int width, int height) {
         viewport.update(width, height);
     }

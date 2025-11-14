@@ -15,7 +15,7 @@ public class Snake extends Carta {
 	/* Permite ver los puntos del rival durante un turno. Baja 8 puntos de tu contador*/
 
 	public Snake() {
-		super(0, 8, Habilidad.VER_PUNTOS_RIVAL, new Imagen(Recursos.SNAKE), false, 0, 0, 
+		super("SNAKE",0, 8, Habilidad.VER_PUNTOS_RIVAL, new Imagen(Recursos.SNAKE), false, 0, 0, 
 				"Permite ver los puntos del rival durante un turno. \nBaja 8 puntos de tu contador",TipoDeCarta.NORMAL);
 	}
 	

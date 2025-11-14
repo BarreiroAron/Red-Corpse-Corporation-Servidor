@@ -17,7 +17,7 @@ public class PecadoDeLaCodicia extends Carta {
 	//Esta carta aumenta tus puntos
 	
 	public PecadoDeLaCodicia() {
-		super(1, -5, Habilidad.ROBAR_CARTA, new Imagen(Recursos.PECADO_CODICIA), true, 0, 0, "Al robar esta carta, cuatro de tus cartas en la mano son destruidas. \n"
+		super("PECADO_DE_LA_CODICIA",1, -5, Habilidad.ROBAR_CARTA, new Imagen(Recursos.PECADO_CODICIA), true, 0, 0, "Al robar esta carta, cuatro de tus cartas en la mano son destruidas. \n"
 				+ "Esta carta permanece en la mano hasta que sea jugada, si esta carta es jugada: \n"
 				+ "Tu rival aumenta 1 en su contador y tu contador se reduce en 5.\r\n",TipoDeCarta.MALA);
 	}

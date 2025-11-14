@@ -1,4 +1,4 @@
-	package cartas;
+package cartas;
 
 import java.util.ArrayList;
 
@@ -24,9 +24,11 @@ public abstract class Carta {
 		private String descripcion;
 		private EnemigoDeterminado enemigoDeterminado= EnemigoDeterminado.IZQUIERDA; ///provisoprio para ver si funciona
 		
+		private String id;
 		
 		
-		public Carta(int puntosAumentadosRival, int puntosDisminuidos, Habilidad habilidad,Imagen texturaCarta, boolean porcentual, int x, int y, String descripcion,TipoDeCarta tipo) {
+		public Carta(String id,int puntosAumentadosRival, int puntosDisminuidos, Habilidad habilidad,Imagen texturaCarta, boolean porcentual, int x, int y, String descripcion,TipoDeCarta tipo) {
+			this.id=id;
 			this.puntosAumentadosRival = puntosAumentadosRival;
 			this.puntosDisminuidos = puntosDisminuidos;
 			this.habilidad = habilidad;
@@ -133,4 +135,11 @@ public abstract class Carta {
 			return this.tipo;
 		}
 		
+		public String getId() {
+		    return id;
+		}
+
+		public void setId(String id) {
+		    this.id = id;
+		}
 	}

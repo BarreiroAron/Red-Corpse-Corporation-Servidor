@@ -17,7 +17,7 @@ public class Chester extends Carta {
 	 */
 
 	public Chester() {
-		super(0, 0, Habilidad.INTERCAMBIO_PUNTOS, new Imagen(Recursos.CHESTER), false, 0, 0, 
+		super("CHESTER",0, 0, Habilidad.INTERCAMBIO_PUNTOS, new Imagen(Recursos.CHESTER), false, 0, 0, 
 				"Al jugar esta carta, los puntos del rival son intercambiados con otro obligatoriamente, \n"
 				+ "de ser más de un jugador, los puntos se cambian al siguiente jugador en la ronda.",TipoDeCarta.NORMAL);
 	}

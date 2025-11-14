@@ -15,7 +15,7 @@ public class NotToday extends Carta {
 	/*Bloquea el efecto de la carta del rival jugada en este momento.*/
 
 	public NotToday() {
-		super(0, 0, Habilidad.BLOQUEAR_EFECTO, new Imagen(Recursos.NOT_TODAY), false, 0, 0, 
+		super("NOT_TODAY",0, 0, Habilidad.BLOQUEAR_EFECTO, new Imagen(Recursos.NOT_TODAY), false, 0, 0, 
 				"Bloquea el efecto de la carta del rival jugada en este momento.",TipoDeCarta.NORMAL);
 	}
 	
