@@ -41,24 +41,41 @@ public class Util {
 						new Imagen(Recursos.PERSONAJE_VIOLETA),
 						424,              // ancho de cada frame	
 						613,              // alto  de cada frame
-						0.08f),
+						0.08f,
+						"PERSONAJE_VIOLETA"),
 				new CuerpoAnimado(
 				        new Imagen(Recursos.PERSONAJE_CELESTE),
 				        873,              // ancho de cada frame
 				        1080,              // alto  de cada frame
-				        0.08f),
+				        0.08f,
+				        "PERSONAJE_CELESTE"),
 				new CuerpoAnimado(
 				        new Imagen(Recursos.PERSONAJE_AMARILLO),
 				        820,              // ancho de cada frame
 				        1180,              // alto  de cada frame
-				        0.08f),
+				        0.08f,
+				        "PERSONAJE_AMARILLO"),
 				new CuerpoAnimado(
 				        new Imagen(Recursos.PERSONAJE_ROJO),
 				        820,              // ancho de cada frame
 				        1180,              // alto  de cada frame
-				        0.08f),
+				        0.08f,
+				        "PERSONAJE_ROJO"),
 				};
 		mezclarArray(personajes); 
 		return personajes;
+	}
+	
+	public static String[] crearListaIdPerRan() {
+	    String[] ids = {
+	        "PERSONAJE_VIOLETA",
+	        "PERSONAJE_CELESTE",
+	        "PERSONAJE_AMARILLO",
+	        "PERSONAJE_ROJO"
+	    };
+
+	    // ya tenés mezclarArray genérico, así que esto funciona
+	    mezclarArray(ids);
+	    return ids;
 	}
 }

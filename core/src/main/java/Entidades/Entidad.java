@@ -15,6 +15,7 @@ public abstract class Entidad {
 	public int puntos;
 	private CuerpoAnimado cuerpo;
 	protected ArrayList<Carta> mano = new ArrayList<>();
+	private String idPersonaje;
 	
 	public Entidad(String nombre, int puntos,CuerpoAnimado cuerpo) {
 		this.nombre = nombre;
@@ -74,4 +75,17 @@ public abstract class Entidad {
 	public void setPuntos(int puntosModificados) {
 		this.puntos += puntosModificados;
 	}
+	
+	public String getPersonajeId() {
+		return this.cuerpo.getId();
+	};
+	
+	public String getIdPersonaje() {
+		return idPersonaje;
+	}
+
+	public void setIdPersonaje(String personajesIds) {
+		this.idPersonaje = personajesIds;
+	}
+
 }

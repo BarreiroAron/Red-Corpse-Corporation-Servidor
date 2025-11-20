@@ -9,6 +9,7 @@ public class Jugador extends Entidad {
 	
 	private String nombre;
 	private int puntos;
+	private String idPersonaje;
 	
 	public Jugador(String nombre, int puntos, CuerpoAnimado cuerpo) {
 		super(nombre, puntos, cuerpo);
@@ -37,4 +38,13 @@ public class Jugador extends Entidad {
 	public void bloquearRobo() {
 		
 	}
+
+	public String getIdPersonaje() {
+		return idPersonaje;
+	}
+
+	public void setIdPersonaje(String idPersonaje) {
+		this.idPersonaje = idPersonaje;
+	}
+	
 }

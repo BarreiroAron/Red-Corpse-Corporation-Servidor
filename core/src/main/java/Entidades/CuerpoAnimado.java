@@ -14,15 +14,18 @@ public class CuerpoAnimado implements Cuerpo {
 
     private final Animation<TextureRegion> anim; //clase que cuenta 
     private float stateTime = 0f;	//contador de frames
-
+    private String id;
     public CuerpoAnimado(Texture sheet, //consturtor con texture de una
                          int frameWidth,
                          int frameHeight,
-                         float frameDurationSecs) {
+                         float frameDurationSecs,
+                         String id) {
 
         TextureRegion[][] tmp = TextureRegion.split(sheet, frameWidth, frameHeight); // se determina cada region del frame
         Array<TextureRegion> frames = new Array<>();
 
+        this.id=id;
+        
         for (TextureRegion[] row : tmp)
             for (TextureRegion reg : row)
                 frames.add(reg);
@@ -33,12 +36,12 @@ public class CuerpoAnimado implements Cuerpo {
     public CuerpoAnimado(Imagen sheetImagen,   //constructor adaptado de imagen 
             int frameWidth,
             int frameHeight,
-            float frameDurationSecs) {
-    
+            float frameDurationSecs, String id) {
+    	
     this(sheetImagen.getTexture(),      //lo pasa a texture             
             frameWidth,
             frameHeight,
-            frameDurationSecs);
+            frameDurationSecs, id);
     }
 
     @Override
@@ -63,4 +66,8 @@ public class CuerpoAnimado implements Cuerpo {
 
         batch.draw(frame, drawX, drawY, dw, dh);
     }
+
+	public String getId() {
+		return this.id;
+	}
 }
