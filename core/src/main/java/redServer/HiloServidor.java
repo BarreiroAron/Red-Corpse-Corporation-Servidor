@@ -7,9 +7,13 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
 
+import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
+
 import Entidades.CuerpoAnimado;
 import Entidades.Entidad;
 import Entidades.Jugador;
+import Pantallas.JuegoPantalla;
 import Utiles.Headless;
 import cartas.Carta;
 import juegos.Juego;
@@ -22,8 +26,12 @@ public class HiloServidor extends Thread{
 	private DireccionRed[] clientes = new DireccionRed[4];
 	private int cantClientes = 0 ;
 	
+	private int turnoActual = 0;
+	
 	private boolean[] clientesListos = new boolean[4];
 	private int cantListos = 0;
+	
+	private Game game;
 	
     private Juego juegoServidor;
 	
@@ -102,7 +110,48 @@ public class HiloServidor extends Thread{
 	            	enviarMensaje("Empieza", clientes[i].getIp(), clientes[i].getPuerto());
 	    	    }
 	        }
+	    }else if (msg.startsWith("PLAY;")) {
+	        int idx = buscarIndiceCliente(dp.getAddress(), dp.getPort());
+	        if (idx == -1) return;
+
+	        if (!partidaIniciada) {
+	            System.out.println("[SERVIDOR] PLAY recibido pero la partida no está iniciada.");
+	            return;
+	        }
+
+	        // Solo el jugador de turno puede jugar
+	        if (!esTurnoDe(idx)) {
+	            System.out.println("[SERVIDOR] PLAY ignorado, no es turno del jugador " + idx);
+	            return;
+	        }
+
+	        String[] partes = msg.split(";");
+	        if (partes.length < 2) return;
+
+	        int indiceCarta;
+	        try {
+	            indiceCarta = Integer.parseInt(partes[1]);
+	        } catch (NumberFormatException e) {
+	            return;
+	        }
+
+	        // Obtenemos el jugador y su mano en el juego del servidor
+	        Entidad jugador = juegoServidor.getJugadores().get(idx);
+
+	        if (indiceCarta < 0 || indiceCarta >= jugador.getMano().size()) {
+	            System.out.println("[SERVIDOR] PLAY índice de carta inválido: " + indiceCarta);
+	            return;
+	        }
+
+	        Carta carta = jugador.getMano().get(indiceCarta);
+
+	        System.out.println("[SERVIDOR] Jugador " + idx + " jugó carta índice " + indiceCarta
+	                + " (id=" + carta.getId() + ")");
+
+	        juegoServidor.jugarCartaConDelay(jugador.getMano().get(indiceCarta),jugador);
+
 	    }
+
 	}
 
 	
@@ -121,6 +170,8 @@ public class HiloServidor extends Thread{
 
 	    ArrayList<Entidad> jugadores = new ArrayList<>();
 	    
+	    turnoActual = 0;
+	    
 	    String[] personajesIds = Utiles.Util.crearListaIdPerRan();
 	    
 	    System.out.println("Creando identidades");
@@ -132,6 +183,13 @@ public class HiloServidor extends Thread{
 	    }
 
 	    juegoServidor = new Juego(jugadores);
+	    
+	   /* Gdx.app.postRunnable(new Runnable() {
+	        @Override
+	        public void run() {
+	            game.setScreen(new JuegoPantalla(game, juegoServidor));
+	        }
+	    });*/
 
 	    System.out.println("[SERVIDOR] Juego creado. Mazo iniciado y cartas repartidas.");
 
@@ -140,6 +198,20 @@ public class HiloServidor extends Thread{
 	    	enviarDatosJugadoresAlCliente(i);
 	        enviarDatosInicialesAlCliente(i);
 	    }
+	    enviarTurnoAClientes();
+	}
+	
+	private void avanzarTurno() {
+	    turnoActual = (turnoActual + 1) % cantClientes; // alterna 0 ↔ 1
+	    enviarTurnoAClientes();
+	}
+	
+	private void enviarTurnoAClientes() {
+	    String msg = "TURN;" + turnoActual;
+	    for (int i = 0; i < cantClientes; i++) {
+	        enviarMensaje(msg, clientes[i].getIp(), clientes[i].getPuerto());
+	    }
+	    System.out.println("[SERVIDOR] Turno enviado a clientes: " + turnoActual);
 	}
 	
 	private void enviarDatosInicialesAlCliente(int indiceCliente) {
@@ -191,7 +263,13 @@ public class HiloServidor extends Thread{
 	    return sb.toString();
 	}
 
+	public Game getGame() {
+		return game;
+	}
 
+	public void setGame(Game game) {
+		this.game = game;
+	}
 
 	public boolean getPartidaIniciada() {
 		return this.partidaIniciada;
@@ -202,6 +280,10 @@ public class HiloServidor extends Thread{
 	        conexion.close();
 	        System.out.println("Socket cerrado correctamente");
 	    }
+	}
+	
+	private boolean esTurnoDe(int idx) {
+	    return idx == turnoActual;
 	}
 	
 	public int getCantClientes() {

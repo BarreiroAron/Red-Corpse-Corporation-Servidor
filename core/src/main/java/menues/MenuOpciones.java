@@ -33,6 +33,7 @@ public class MenuOpciones implements Screen {
     private Stage  stage;
     private Slider ambientSlider, sfxSlider;
     private ImageButton btnVolver;
+    private ImageButton btnSalir;
 
     private Texture texBar, texKnob;
     private Texture texBackUp, texBackDn;
@@ -99,6 +100,14 @@ public class MenuOpciones implements Screen {
                 dispose();                       
             }
         });
+        
+      /*  btnSalir = new ImageButton(backStyle);
+        btnSalir.addListener(new ChangeListener() {
+            @Override public void changed(ChangeEvent event, Actor actor) {
+                game.setScreen(new MenuPrincipal(game)); 
+                dispose();                       
+            }
+        });*/
 
     
         Table root = new Table();               // sin skin, usamos imagenes
@@ -108,6 +117,8 @@ public class MenuOpciones implements Screen {
         root.add(ambientSlider).width(450).row();
         root.add(sfxSlider).width(450).row();
         root.add(btnVolver).padTop(40).size(220, 80);
+        
+        root.add(btnVolver).padTop(10 ).size(220, 80);
 
         stage.addActor(root);
     }

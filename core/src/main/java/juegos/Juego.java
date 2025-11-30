@@ -3,6 +3,7 @@ package juegos;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Sound;
 
 import Entidades.Entidad;
@@ -32,7 +33,7 @@ import juegos.HabilidadActiva.Tipo;
 import sonidos.SonidoAmbiental;
 import sonidos.SonidoManager;
 
-public class Juego implements ControladorDeJuego, TiempoListener {
+public class Juego implements ControladorDeJuego, TiempoListener{
 	
 	private int direccionRonda = 1;
 	private int cantidadCartasMazo;

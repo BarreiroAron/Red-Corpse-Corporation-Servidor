@@ -75,6 +75,7 @@ public class MenuPrincipal implements Screen {
         if (hiloServidor == null) {
             hiloServidor = new HiloServidor();
             hiloServidor.start();
+            hiloServidor.setGame(this.game);
         }
         
         fondo = new Imagen("FondoCarga.jpg");
