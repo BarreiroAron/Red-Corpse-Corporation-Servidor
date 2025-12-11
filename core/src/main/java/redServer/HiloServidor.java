@@ -8,7 +8,6 @@ import java.net.SocketException;
 import java.util.ArrayList;
 
 import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Gdx;
 
 import Entidades.CuerpoAnimado;
 import Entidades.Entidad;
@@ -18,7 +17,7 @@ import Utiles.Headless;
 import cartas.Carta;
 import juegos.Juego;
 
-public class HiloServidor extends Thread{
+public class HiloServidor extends Thread implements ServidorAPI{
 	
 	private DatagramSocket conexion;
 	private boolean fin = false;
@@ -38,6 +37,9 @@ public class HiloServidor extends Thread{
 	private boolean partidaIniciada = false;
 	
 	private int puntosDeVidaJugadores=100;
+
+	private Thread hiloPartida;
+	private volatile boolean partidaCorriendo = false;
 
 	
 	public HiloServidor() {
@@ -183,6 +185,7 @@ public class HiloServidor extends Thread{
 	    }
 
 	    juegoServidor = new Juego(jugadores);
+	    juegoServidor.setServidorAPI(this);
 	    
 	   /* Gdx.app.postRunnable(new Runnable() {
 	        @Override
@@ -192,21 +195,27 @@ public class HiloServidor extends Thread{
 	    });*/
 
 	    System.out.println("[SERVIDOR] Juego creado. Mazo iniciado y cartas repartidas.");
-
+	   
+	    partidaCorriendo = true;
+	    hiloPartida = new Thread(() -> loopPartida());
+	    hiloPartida.start();
+	    
 	    // Mandar a cada cliente su entidad y su mano inicial
 	    for (int i = 0; i < cantClientes; i++) {
 	    	enviarDatosJugadoresAlCliente(i);
 	        enviarDatosInicialesAlCliente(i);
 	    }
 	    enviarTurnoAClientes();
+	    partidaIniciada = true;
+
 	}
 	
-	private void avanzarTurno() {
+	public void avanzarTurno() {
 	    turnoActual = (turnoActual + 1) % cantClientes; // alterna 0 ↔ 1
 	    enviarTurnoAClientes();
 	}
 	
-	private void enviarTurnoAClientes() {
+	public void enviarTurnoAClientes() {
 	    String msg = "TURN;" + turnoActual;
 	    for (int i = 0; i < cantClientes; i++) {
 	        enviarMensaje(msg, clientes[i].getIp(), clientes[i].getPuerto());
@@ -288,6 +297,67 @@ public class HiloServidor extends Thread{
 	
 	public int getCantClientes() {
 		return this.cantClientes;
+	}
+
+	@Override
+	public void enviarMesaActualAJugadores(int idxJugador, Carta cartaEnMesa) {
+	    if (cartaEnMesa == null) return;
+
+	    String cartaId = cartaEnMesa.getId();
+	    String msgMesa = "MESA;" + idxJugador + ";" + cartaId;
+
+	    for (int i = 0; i < cantClientes; i++) {
+	        enviarMensaje(msgMesa, clientes[i].getIp(), clientes[i].getPuerto());
+	    }
+
+	    System.out.println("[SERVIDOR] Enviado a clientes: " + msgMesa);
+	}
+
+	@Override
+	public void enviarCartaATodos(Carta carta) {
+	    if (carta == null) return;
+
+	    String cartaId = carta.getId();
+	    String msg = "CARTA_GLOBAL;" + cartaId;
+
+	    for (int i = 0; i < cantClientes; i++) {
+	        enviarMensaje(msg, clientes[i].getIp(), clientes[i].getPuerto());
+	    }
+
+	    System.out.println("[SERVIDOR] CARTA_GLOBAL enviada a todos: " + cartaId);
+	}
+
+
+	private void loopPartida() {
+	    long ultimoTiempo = System.nanoTime();
+
+	    while (partidaCorriendo) {
+	        long ahora = System.nanoTime();
+	        float delta = (ahora - ultimoTiempo) / 1_000_000_000f;
+	        ultimoTiempo = ahora;
+
+	        //  Avanzar logica del juego del SERVIDOR
+	        if (juegoServidor != null) {
+	            juegoServidor.actualizar();
+	        }
+
+	        try {
+	            Thread.sleep(16); // un "descanso"
+	        } catch (InterruptedException e) {
+	            Thread.currentThread().interrupt();
+	            break;
+	        }
+	    }
+
+	    System.out.println("[SERVIDOR] Loop de partida detenido.");
+	}
+
+	public void notificarFinPartida() {
+	    partidaCorriendo = false;
+	    /* en Juego cuando termine:
+	    if (servidorAPI != null) {
+	        servidorAPI.notificarFinPartida();
+	    }*/
 	}
 }
 

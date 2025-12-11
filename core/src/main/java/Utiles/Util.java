@@ -3,6 +3,25 @@ package Utiles;
 import com.badlogic.gdx.Gdx;
 
 import Entidades.CuerpoAnimado;
+import cartas.Carta;
+import cartasEspeciales.IMHERE;
+import cartasEspeciales.Inanicion;
+import cartasMalas.PecadoDeLaCodicia;
+import cartasMalas.Sonambulo;
+import cartasNormales.CambioDeRonda;
+import cartasNormales.Chester;
+import cartasNormales.Colera;
+import cartasNormales.Company;
+import cartasNormales.Estrenimiento;
+import cartasNormales.HambreContenida;
+import cartasNormales.KingDice;
+import cartasNormales.Mimico;
+import cartasNormales.NotToday;
+import cartasNormales.OjoQueTodoLoVe;
+import cartasNormales.Redento;
+import cartasNormales.Saltamontes;
+import cartasNormales.Snake;
+import cartasNormales.ThanksForPlaying;
 
 import java.util.Random;
 
@@ -78,4 +97,74 @@ public class Util {
 	    mezclarArray(ids);
 	    return ids;
 	}
+	
+	public static Carta crearCartaDesdeId(String id) {
+
+        switch (id) {
+
+            // ---------------- CARTAS NORMALES ---------------- //
+            case "CAMBIO_DE_RONDA":
+                return new CambioDeRonda();
+
+            case "CHESTER":
+                return new Chester();
+
+            case "COLERA":
+                return new Colera();
+
+            case "COMPANY":
+                return new Company();
+
+            case "ESTENIMIENTO":
+                return new Estrenimiento();
+
+            case "HAMBRE_CONTENIDA":
+                return new HambreContenida();
+
+            case "KING_DICE":
+                return new KingDice();
+
+            case "MIMICO":
+                return new Mimico();
+
+            case "NOT_TODAY":
+                return new NotToday();
+
+            case "OJO_QUE_TODO_LO_VE":
+                return new OjoQueTodoLoVe();
+
+            case "REDENTO":
+                return new Redento();
+
+            case "SALTAMONTES":
+                return new Saltamontes();
+
+            case "SNAKE":
+                return new Snake();
+
+            case "THANKS_FOR_PLAYING":
+                return new ThanksForPlaying();
+
+
+            // ---------------- CARTAS MALAS ---------------- //
+            case "SONAMBULO":
+                return new Sonambulo();
+
+            case "PECADO_DE_LA_CODICIA":
+                return new PecadoDeLaCodicia();
+
+
+            // ---------------- CARTAS ESPECIALES ---------------- //
+            case "IMHERE":
+                return new IMHERE();
+
+            case "INANICION":
+                return new Inanicion();
+
+
+            default:
+                System.out.println("[ERROR] Carta no reconocida: " + id);
+                return null;
+        }
+    }
 }

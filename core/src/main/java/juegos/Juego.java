@@ -30,8 +30,12 @@ import cartasNormales.Saltamontes;
 import cartasNormales.Snake;
 import cartasNormales.ThanksForPlaying;
 import juegos.HabilidadActiva.Tipo;
+import redServer.HiloServidor;
 import sonidos.SonidoAmbiental;
 import sonidos.SonidoManager;
+
+import redServer.ServidorAPI;
+
 
 public class Juego implements ControladorDeJuego, TiempoListener{
 	
@@ -46,7 +50,7 @@ public class Juego implements ControladorDeJuego, TiempoListener{
 	private int indiceJugadorActual=0;
 	private float tiempo =0.5f;
 	private int rondas=0;
-	
+		
 	Entidad jugadorPerdedor=null;
 	
 	HiloTiempoPartida hiloDeTiempo;
@@ -61,8 +65,6 @@ public class Juego implements ControladorDeJuego, TiempoListener{
 	private Carta cartaPendiente = null;
 	private Entidad jugadorQueLaJugoPendiente = null;
 	private int ticksPendientes = 0;
-
-	
 	
 	public final ArrayList<HabilidadActiva> habilidadesActivas = new ArrayList<>();
 	//intentar despues evitar esta variable
@@ -75,7 +77,9 @@ public class Juego implements ControladorDeJuego, TiempoListener{
 	private ArrayList<Carta> cartasMostradas = new ArrayList<>();
 	
     private Sound CartaTirada;
-	
+  
+    private ServidorAPI servidorAPI;
+    
 	public Juego( ArrayList<Entidad> Jugadores){
 		this.jugadores= Jugadores;
 		iniciarMazo();
@@ -147,10 +151,13 @@ public class Juego implements ControladorDeJuego, TiempoListener{
 		// si bloque_activo no essta se ejecuta
 	    if (habilidadesActivas.stream().noneMatch(h -> h.getTipo() == HabilidadActiva.Tipo.BLOQUEO_ACTIVO)) {
 	    	jugarCarta(cartaPendiente,jugadorQueLaJugoPendiente);
+	    	agregarCartaMesa(cartaPendiente);
 	    } else {
 	        System.out.println("Carta bloqueada por efecto de Bloqueo.");
 	    }
 
+	    
+	    sumarRonda();
 	    // limpia general
 	    cartaPendiente = null;
 	    jugadorQueLaJugoPendiente = null;
@@ -500,6 +507,17 @@ public class Juego implements ControladorDeJuego, TiempoListener{
 		return cartas;
 	}
 	
+	public void agregarCartaMesa(Entidad jugador, Carta carta) {
+        mesa.add(carta);
+
+        int idxJugador = jugadores.indexOf(jugador);
+
+        if (servidorAPI != null && idxJugador != -1) {
+            // 🔹 avisar al servidor cada vez que se toca la mesa
+            servidorAPI.enviarMesaActualAJugadores(idxJugador, carta);
+        }
+    }
+	
 	public void pasarCartas(ArrayList<Carta> ListaCartas1 , ArrayList<Carta> LiscaCartas2) {
 		
 		for(int i=0;i<ListaCartas1.size();i++) {
@@ -546,6 +564,8 @@ public class Juego implements ControladorDeJuego, TiempoListener{
 	
 	public void agregarCartaMesa(Carta  carta) {
 		mesa.add(carta);
+		
+		servidorAPI.enviarCartaATodos(carta);
 		aumentarIndiceMesa();
 	}
 	
@@ -564,6 +584,7 @@ public class Juego implements ControladorDeJuego, TiempoListener{
 	       */ 
 		
 		this.rondas++;
+		servidorAPI.avanzarTurno();
 		System.out.println("Se sumo una ronda");
 		if (isHabilidadActivaEnJugador(HabilidadActiva.Tipo.INANICION, getJugadorActual())){
 			
@@ -845,6 +866,10 @@ public void robarCartasMalas(Entidad jugador) {
 	    habilidadesActivas.add(HabilidadActiva.bloqueoActivo(jugador));
 	    System.out.println("Bloqueo ACTIVADO por " + jugador.getNombre());
 	}
+	
+	 public void setServidorAPI(ServidorAPI servidorAPI) {
+	        this.servidorAPI = servidorAPI;
+	    }
 	
 	public boolean hayCartaPendiente() {
 	    return cartaPendiente != null;
