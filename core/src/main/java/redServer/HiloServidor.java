@@ -359,5 +359,32 @@ public class HiloServidor extends Thread implements ServidorAPI{
 	        servidorAPI.notificarFinPartida();
 	    }*/
 	}
+
+	@Override
+	public void enviarModificacionDePuntos(Entidad objetivo, int puntos, boolean esPorcentual) {
+	    try {
+	        int indiceJugador = juegoServidor.getJugadores().indexOf(objetivo); // ← ESTE es el índice real en la partida
+
+	        if (indiceJugador == -1) {
+	            System.out.println("[SERVIDOR] ERROR: no se encontró el índice del jugador.");
+	            return;
+	        }
+
+	        // Formato:
+	        // PUNTOS;indice;puntos;esPorcentual
+	        String msg = "PUNTOS;" + indiceJugador + ";" + puntos + ";" + (esPorcentual ? 1 : 0);
+
+	        // Enviar a todos
+	        for (int i = 0; i < cantClientes; i++) {
+	            enviarMensaje(msg, clientes[i].getIp(), clientes[i].getPuerto());
+	        }
+
+	        System.out.println("[SERVIDOR] Enviando modificación de puntos: " + msg);
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	}
+
 }
 

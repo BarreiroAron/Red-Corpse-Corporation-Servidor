@@ -378,10 +378,10 @@ public class Juego implements ControladorDeJuego, TiempoListener{
 
 	    	}
 
-	    }
+	    } 
 	    
-	    jugador.modificarPuntos(carta.getPuntosDisminuidos(), carta.getPorcentual());
-	    enemigo.modificarPuntos(carta.getPuntosAumentadosRival(), carta.getPorcentual());
+	    modificarPuntos(jugador,carta.getPuntosDisminuidos(), carta.getPorcentual());
+	    modificarPuntos(enemigo,carta.getPuntosAumentadosRival(), carta.getPorcentual());
 	    carta.getHabilidad().ejecutar(carta, jugador, enemigo, this);
 	    
 	    if (carta.getHabilidad() != null) {
@@ -726,6 +726,7 @@ public class Juego implements ControladorDeJuego, TiempoListener{
 	
 	@Override
     public void modificarPuntos(Entidad objetivo, int puntos, boolean esPorcentual) {
+		servidorAPI.enviarModificacionDePuntos(objetivo,puntos, esPorcentual);
         objetivo.modificarPuntos(puntos, esPorcentual);
     }
 	

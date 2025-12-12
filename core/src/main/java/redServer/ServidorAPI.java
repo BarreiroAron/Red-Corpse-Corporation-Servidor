@@ -1,6 +1,7 @@
 // por ejemplo en redServer/ServidorAPI.java
 package redServer;
 
+import Entidades.Entidad;
 import cartas.Carta;
 
 public interface ServidorAPI {
@@ -10,5 +11,6 @@ public interface ServidorAPI {
     void enviarTurnoAClientes();
     // acá vas sumando TODO lo que Juego deba pedirle a la red
 	void avanzarTurno();
+	void enviarModificacionDePuntos(Entidad objetivo, int puntos, boolean esPorcentual);
 }
 
