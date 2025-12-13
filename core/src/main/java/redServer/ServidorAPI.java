@@ -12,5 +12,7 @@ public interface ServidorAPI {
     // acá vas sumando TODO lo que Juego deba pedirle a la red
 	void avanzarTurno();
 	void enviarModificacionDePuntos(Entidad objetivo, int puntos, boolean esPorcentual);
+	void enviarCartaJugada(Carta cartaPendiente, Entidad jugadorQueLaJugoPendiente);
+	void enviarDatosInicialesAlClienteTodos();
 }
 

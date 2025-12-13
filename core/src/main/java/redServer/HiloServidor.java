@@ -152,10 +152,54 @@ public class HiloServidor extends Thread implements ServidorAPI{
 
 	        juegoServidor.jugarCartaConDelay(jugador.getMano().get(indiceCarta),jugador);
 
+	    }else if (msg.equals("DRAW") || msg.startsWith("DRAW")) {
+	        int jugadorIndex = buscarIndiceCliente(dp.getAddress(), dp.getPort());
+	        if (jugadorIndex == -1) return;
+
+	        procesarRobo(jugadorIndex);
 	    }
+
 
 	}
 
+	private void procesarRobo(int jugadorIndex) {
+
+	    // Validar turno
+	    if (turnoActual != jugadorIndex) {
+	        enviarMensaje(
+	            "DRAW_DENY;NOT_TURN",
+	            clientes[jugadorIndex].getIp(),
+	            clientes[jugadorIndex].getPuerto()
+	        );
+	        return;
+	    }
+
+	    Entidad jugador = juegoServidor.getJugadores().get(jugadorIndex);
+
+	    // Robar del mazo (autoridad total del server)
+	    Carta robada = juegoServidor.robarCartaMazo(jugador);
+
+	    if (robada == null) {
+	        enviarMensaje(
+	            "DRAW_DENY;EMPTY",
+	            clientes[jugadorIndex].getIp(),
+	            clientes[jugadorIndex].getPuerto()
+	        );
+	        return;
+	    }
+
+	    //  Enviar carta SOLO al jugador
+	    String msg = "DRAW_SELF;" + robada.getId();
+	    enviarMensaje(msg, clientes[jugadorIndex].getIp(), clientes[jugadorIndex].getPuerto());
+
+	    System.out.println("[SERVIDOR] Jugador " + jugadorIndex + " robó " + robada.getId());
+
+	    //  AVANZAR TURNO
+	    avanzarTurno();
+	}
+
+
+	
 	
 	private int buscarIndiceCliente(InetAddress ip, int puerto) {
 	    for (int i = 0; i < cantClientes; i++) {
@@ -210,19 +254,6 @@ public class HiloServidor extends Thread implements ServidorAPI{
 
 	}
 	
-	public void avanzarTurno() {
-	    turnoActual = (turnoActual + 1) % cantClientes; // alterna 0 ↔ 1
-	    enviarTurnoAClientes();
-	}
-	
-	public void enviarTurnoAClientes() {
-	    String msg = "TURN;" + turnoActual;
-	    for (int i = 0; i < cantClientes; i++) {
-	        enviarMensaje(msg, clientes[i].getIp(), clientes[i].getPuerto());
-	    }
-	    System.out.println("[SERVIDOR] Turno enviado a clientes: " + turnoActual);
-	}
-	
 	private void enviarDatosInicialesAlCliente(int indiceCliente) {
 	    Entidad jugador = juegoServidor.getJugador(indiceCliente);
 
@@ -239,6 +270,20 @@ public class HiloServidor extends Thread implements ServidorAPI{
 	    enviarMensaje(mensaje,
 	            clientes[indiceCliente].getIp(),
 	            clientes[indiceCliente].getPuerto());
+	    enviarTurnoAClientes();
+	}
+	
+	public void avanzarTurno() {
+	    turnoActual = (turnoActual + 1) % cantClientes; // alterna 0 ↔ 1
+	    enviarTurnoAClientes();
+	}
+	
+	public void enviarTurnoAClientes() {
+	    String msg = "TURN;" + turnoActual;
+	    for (int i = 0; i < cantClientes; i++) {
+	        enviarMensaje(msg, clientes[i].getIp(), clientes[i].getPuerto());
+	    }
+	    System.out.println("[SERVIDOR] Turno enviado a clientes: " + turnoActual);
 	}
 	
 	private void enviarDatosJugadoresAlCliente(int indiceCliente) {
@@ -384,6 +429,38 @@ public class HiloServidor extends Thread implements ServidorAPI{
 	    } catch (Exception e) {
 	        e.printStackTrace();
 	    }
+	}
+
+	@Override
+	public void enviarCartaJugada(Carta cartaPendiente, Entidad jugadorQueLaJugo) {
+
+	    if (cartaPendiente == null || jugadorQueLaJugo == null) return;
+
+	    // El ID será el índice del jugador en la partida
+	    int jugadorIndex = juegoServidor.getJugadores().indexOf(jugadorQueLaJugo);
+	    if (jugadorIndex == -1) {
+	        System.out.println("[SERVIDOR] No se encontró índice del jugador para enviarCartaJugada.");
+	        return;
+	    }
+
+	    String cartaId = cartaPendiente.getId(); // ejemplo: CHESTER, CAMBIO_DE_RONDA
+
+	    // Mensaje para todos:
+	    // CARTA_JUGADA;jugadorIndex;cartaId
+	    String msg = "CARTA_JUGADA;" + jugadorIndex + ";" + cartaId;
+
+	    for (int i = 0; i < cantClientes; i++) {
+	        enviarMensaje(msg, clientes[i].getIp(), clientes[i].getPuerto());
+	    }
+
+	    System.out.println("[SERVIDOR] Enviada CARTA_JUGADA: " + msg);
+	}
+
+	@Override
+	public void enviarDatosInicialesAlClienteTodos() {
+		for(int i=0 ; i<cantClientes ;i++) {
+		enviarDatosInicialesAlCliente(i);
+		}
 	}
 
 }

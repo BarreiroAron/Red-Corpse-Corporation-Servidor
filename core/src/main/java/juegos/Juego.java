@@ -48,7 +48,7 @@ public class Juego implements ControladorDeJuego, TiempoListener{
 	
 	private int indiceMesa=0;
 	private int indiceJugadorActual=0;
-	private float tiempo =0.5f;
+	private float tiempo =1000.5f;
 	private int rondas=0;
 		
 	Entidad jugadorPerdedor=null;
@@ -152,6 +152,8 @@ public class Juego implements ControladorDeJuego, TiempoListener{
 	    if (habilidadesActivas.stream().noneMatch(h -> h.getTipo() == HabilidadActiva.Tipo.BLOQUEO_ACTIVO)) {
 	    	jugarCarta(cartaPendiente,jugadorQueLaJugoPendiente);
 	    	agregarCartaMesa(cartaPendiente);
+	    	//enviar los efectos y no los efectos porque esta random y esto trae problemas
+	    	//servidorAPI.enviarCartaJugada(cartaPendiente,jugadorQueLaJugoPendiente);
 	    } else {
 	        System.out.println("Carta bloqueada por efecto de Bloqueo.");
 	    }
@@ -425,12 +427,17 @@ public class Juego implements ControladorDeJuego, TiempoListener{
 		
 	}
 	
-	public void robarCartaMazo(Entidad jugador) {
-		robarCartaMazo(jugador, false);
-		limpiarInanicionSiCorresponde(jugador);
+	public Carta robarCartaMazo(Entidad jugador) {
+	    if (mazo.isEmpty()) return null;
+
+	    Carta carta = mazo.remove(0); // o como lo hagas
+	    jugador.getMano().add(carta);
+	    return carta;
 	}
 	
+	
 	public void robarCartaMazo(Entidad jugador, boolean ignorarBloqueosDeRobo) {
+		limpiarInanicionSiCorresponde(jugador);
 	    if (!ignorarBloqueosDeRobo && estaBloqueadoRobar(jugador)) {
 	        System.out.println("Bloqueado: " + jugador.getNombre() + " no puede robar del mazo.");
 	        return;
@@ -558,6 +565,11 @@ public class Juego implements ControladorDeJuego, TiempoListener{
 		mesa.clear();
 		iniciarMazo();
 		repartirCartas();
+		for(Entidad jugador : jugadores) {
+			jugador.getMano().clear();
+		}
+		
+		servidorAPI.enviarDatosInicialesAlClienteTodos();
 		
 		System.out.println("Partida reiniciada por Company");
 	}
@@ -588,7 +600,7 @@ public class Juego implements ControladorDeJuego, TiempoListener{
 		System.out.println("Se sumo una ronda");
 		if (isHabilidadActivaEnJugador(HabilidadActiva.Tipo.INANICION, getJugadorActual())){
 			
-			getJugadorActual().modificarPuntos(getJugadorActual().getPuntos(), false);
+			modificarPuntos(getJugadorActual(),getJugadorActual().getPuntos(), false);
 		}
 		siguienteJugador();
 	}
@@ -734,7 +746,7 @@ public class Juego implements ControladorDeJuego, TiempoListener{
 	public void modificarPuntosGlobal(Entidad jugadorEjecutador, int puntos, boolean esPorcentual) {
 		for(Entidad jugador: jugadores) {
 			if(jugador!=jugadorEjecutador) {
-			jugador.modificarPuntos(puntos, esPorcentual);
+			modificarPuntos(jugador,puntos, esPorcentual);
 			}
 		}
     }
