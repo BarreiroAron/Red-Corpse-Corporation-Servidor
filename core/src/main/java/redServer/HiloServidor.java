@@ -384,6 +384,7 @@ public class HiloServidor extends Thread implements ServidorAPI{
 	        //  Avanzar logica del juego del SERVIDOR
 	        if (juegoServidor != null) {
 	            juegoServidor.actualizar();
+	            enviarProgresoDeTiempoATodos(juegoServidor.getProgresoTiempo());
 	        }
 
 	        try {
@@ -403,6 +404,15 @@ public class HiloServidor extends Thread implements ServidorAPI{
 	    if (servidorAPI != null) {
 	        servidorAPI.notificarFinPartida();
 	    }*/
+	}
+	
+	public void enviarProgresoDeTiempoATodos(float tiempo) {
+		
+		String msg = "TIEMPO_DE_PPROGRESO;" + tiempo;
+		
+	    for (int i = 0; i < cantClientes; i++) {
+	        enviarMensaje(msg, clientes[i].getIp(), clientes[i].getPuerto());
+	    }
 	}
 
 	@Override
@@ -462,6 +472,8 @@ public class HiloServidor extends Thread implements ServidorAPI{
 		enviarDatosInicialesAlCliente(i);
 		}
 	}
+	
+	
 
 	@Override
 	public void enviarEliminarCartaJugador(Entidad jugador, int indiceCartaEnMano) {

@@ -48,7 +48,7 @@ public class Juego implements ControladorDeJuego, TiempoListener{
 	
 	private int indiceMesa=0;
 	private int indiceJugadorActual=0;
-	private float tiempo =1000.5f;
+	private float tiempo =2.5f;
 	private int rondas=0;
 		
 	Entidad jugadorPerdedor=null;
