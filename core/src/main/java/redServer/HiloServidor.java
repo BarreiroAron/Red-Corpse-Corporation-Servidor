@@ -463,5 +463,24 @@ public class HiloServidor extends Thread implements ServidorAPI{
 		}
 	}
 
+	@Override
+	public void enviarEliminarCartaJugador(Entidad jugador, int indiceCartaEnMano) {
+
+	    int jugadorIndex = juegoServidor.getJugadores().indexOf(jugador);
+	    if (jugadorIndex == -1) return;
+
+	    String msg = "REMOVE_CARD;" + jugadorIndex + ";" + indiceCartaEnMano;
+
+	    for (int i = 0; i < cantClientes; i++) {
+	        enviarMensaje(msg, clientes[i].getIp(), clientes[i].getPuerto());
+	    }
+
+	    System.out.println(
+	        "[SERVIDOR] REMOVE_CARD enviado -> jugador=" + jugadorIndex +
+	        " indiceCarta=" + indiceCartaEnMano
+	    );
+	}
+
+
 }
 

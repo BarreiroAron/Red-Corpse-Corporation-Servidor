@@ -262,6 +262,7 @@ public class Juego implements ControladorDeJuego, TiempoListener{
 	        System.out.println("Ya hay una carta en resolución. Esperá a que termine.");
 	        return;
 	    }
+	    servidorAPI.enviarEliminarCartaJugador(jugador,getIndiceCartaEnManoPorId(jugador,carta.getId()));
 	    jugador.getMano().remove(carta);
 	    
 	    this.cartaPendiente = carta;
@@ -309,6 +310,16 @@ public class Juego implements ControladorDeJuego, TiempoListener{
 		        jugadorPerdedor = null;
 		    }
 	}
+	
+	public int getIndiceCartaEnManoPorId(Entidad jugador, String cartaId) {
+	    for (int i = 0; i < jugador.getMano().size(); i++) {
+	        if (jugador.getMano().get(i).getId().equals(cartaId)) {
+	            return i;
+	        }
+	    }
+	    return -1;
+	}
+
 	
 	private void eliminarYReacomodarJugador(Entidad jugadorAEliminar) {
 	    if (jugadores.isEmpty()) return;

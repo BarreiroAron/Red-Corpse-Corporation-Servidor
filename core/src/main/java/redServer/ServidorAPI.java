@@ -14,5 +14,6 @@ public interface ServidorAPI {
 	void enviarModificacionDePuntos(Entidad objetivo, int puntos, boolean esPorcentual);
 	void enviarCartaJugada(Carta cartaPendiente, Entidad jugadorQueLaJugoPendiente);
 	void enviarDatosInicialesAlClienteTodos();
+	void enviarEliminarCartaJugador(Entidad jugador, int indiceCartaEnManoPorId);
 }
 
