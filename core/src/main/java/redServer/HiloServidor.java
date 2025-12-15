@@ -541,12 +541,36 @@ public class HiloServidor extends Thread implements ServidorAPI{
 		 if (turnoActual >= cantClientes) {
 			    turnoActual = 0;
 			}
-		 
+		  enviarTurnoAClientes();
 		System.out.println(
 		        "[SERVIDOR] JUGAADOR_ELIMINADO ENVIADO -> jugador=" + idxJugador
 		    );
 		  eliminarClientePorIndice(idxJugador);
 	}
+
+	@Override
+	public void enviarJugadorGanador(int idxUltimo) {
+		String msg = "JUGADOR_GANADOR;";
+		
+		enviarMensaje(msg, clientes[idxUltimo].getIp(), clientes[idxUltimo].getPuerto());
+		
+		System.out.println(
+		        "[SERVIDOR] JUGAADOR_GANADIR ENVIADO -> jugador=" + idxUltimo
+		    );
+	}
+	
+	// en HiloServidor
+	public void enviarAjusteIndiceJugador(int indexEliminado) {
+	    String msg = "AJUSTAR_INDEX;" + indexEliminado;
+
+	    for (int i = 0; i < cantClientes; i++) {
+	        if (clientes[i] == null) continue;
+	        enviarMensaje(msg, clientes[i].getIp(), clientes[i].getPuerto());
+	    }
+	}
+
+	
+	
 
 
 }

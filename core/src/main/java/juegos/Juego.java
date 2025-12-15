@@ -48,7 +48,7 @@ public class Juego implements ControladorDeJuego, TiempoListener{
 	
 	private int indiceMesa=0;
 	private int indiceJugadorActual=0;
-	private float tiempo =2.5f;
+	private float tiempo =0.5f;
 	private int rondas=0;
 		
 	Entidad jugadorPerdedor=null;
@@ -299,7 +299,8 @@ public class Juego implements ControladorDeJuego, TiempoListener{
 		
 		if(jugadores.size()==1) {
 			partidaFinalizada=true;
-			//servidorAPI.enviarJugadorGanador(int jugadores.addFirst(jugadorPerdedor));
+			int idxUltimo = getIndiceUltimoJugador();
+			servidorAPI.enviarJugadorGanador(idxUltimo);
 		}
 	}
 
@@ -332,6 +333,7 @@ public class Juego implements ControladorDeJuego, TiempoListener{
 	    //Elimina el juagodor
 	    jugadores.remove(indexEliminado);
 	    servidorAPI.enviarJugadorEliminadoATodos(indexEliminado);
+	    servidorAPI.enviarAjusteIndiceJugador(indexEliminado);
 
 	    if (jugadores.isEmpty()) {
 	        indiceJugadorActual = 0;
@@ -900,5 +902,11 @@ public void robarCartasMalas(Entidad jugador) {
 	public boolean hayCartaPendiente() {
 	    return cartaPendiente != null;
 	}
+	
+	public int getIndiceUltimoJugador() {
+	    if (jugadores == null || jugadores.isEmpty()) return -1;
+	    return jugadores.size() - 1;
+	}
+
 
 }
