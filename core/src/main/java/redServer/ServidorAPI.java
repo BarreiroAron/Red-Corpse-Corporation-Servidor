@@ -15,5 +15,6 @@ public interface ServidorAPI {
 	void enviarCartaJugada(Carta cartaPendiente, Entidad jugadorQueLaJugoPendiente);
 	void enviarDatosInicialesAlClienteTodos();
 	void enviarEliminarCartaJugador(Entidad jugador, int indiceCartaEnManoPorId);
+	void enviarJugadorEliminadoATodos(int idxJugador);
 }
 

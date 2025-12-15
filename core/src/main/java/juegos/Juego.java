@@ -299,6 +299,7 @@ public class Juego implements ControladorDeJuego, TiempoListener{
 		
 		if(jugadores.size()==1) {
 			partidaFinalizada=true;
+			//servidorAPI.enviarJugadorGanador(int jugadores.addFirst(jugadorPerdedor));
 		}
 	}
 
@@ -330,6 +331,7 @@ public class Juego implements ControladorDeJuego, TiempoListener{
 	    mazo.addAll(jugadores.get(indexEliminado).getMano());
 	    //Elimina el juagodor
 	    jugadores.remove(indexEliminado);
+	    servidorAPI.enviarJugadorEliminadoATodos(indexEliminado);
 
 	    if (jugadores.isEmpty()) {
 	        indiceJugadorActual = 0;
@@ -441,7 +443,7 @@ public class Juego implements ControladorDeJuego, TiempoListener{
 	public Carta robarCartaMazo(Entidad jugador) {
 	    if (mazo.isEmpty()) return null;
 
-	    Carta carta = mazo.remove(0); // o como lo hagas
+	    Carta carta = mazo.remove(0); 
 	    jugador.getMano().add(carta);
 	    return carta;
 	}

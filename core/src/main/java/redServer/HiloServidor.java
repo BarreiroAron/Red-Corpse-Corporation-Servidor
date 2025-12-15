@@ -414,6 +414,43 @@ public class HiloServidor extends Thread implements ServidorAPI{
 	        enviarMensaje(msg, clientes[i].getIp(), clientes[i].getPuerto());
 	    }
 	}
+	
+	private void eliminarClientePorIndice(int indice) {
+	    if (indice < 0 || indice >= cantClientes) return;
+
+	    // Corrés todo a la izquierda
+	    for (int i = indice; i < cantClientes - 1; i++) {
+	        clientes[i] = clientes[i + 1];
+	        clientesListos[i] = clientesListos[i + 1]; // importante
+	    }
+
+	    // Limpias último slot
+	    clientes[cantClientes - 1] = null;
+	    clientesListos[cantClientes - 1] = false;
+
+	    cantClientes--;
+
+	    if (turnoActual >= cantClientes) {
+	        turnoActual = 0;
+	    }
+	    
+	    // Ajustar cantListos si el eliminado estaba listo
+	    // (solo si vos llevás cantListos como contador real)
+	    recalcularCantListos();
+
+
+	    
+	    System.out.println("[SERVIDOR] Cliente eliminado. Nuevo cantClientes=" + cantClientes);
+	}
+
+	private void recalcularCantListos() {
+	    int c = 0;
+	    for (int i = 0; i < cantClientes; i++) {
+	        if (clientesListos[i]) c++;
+	    }
+	    cantListos = c;
+	}
+
 
 	@Override
 	public void enviarModificacionDePuntos(Entidad objetivo, int puntos, boolean esPorcentual) {
@@ -491,6 +528,24 @@ public class HiloServidor extends Thread implements ServidorAPI{
 	        "[SERVIDOR] REMOVE_CARD enviado -> jugador=" + jugadorIndex +
 	        " indiceCarta=" + indiceCartaEnMano
 	    );
+	}
+
+	@Override
+	public void enviarJugadorEliminadoATodos(int idxJugador) {
+		
+		String msg = "JUGADOR_ELIMINADO;" + idxJugador;
+		
+		 for (int i = 0; i < cantClientes; i++) {
+		        enviarMensaje(msg, clientes[i].getIp(), clientes[i].getPuerto());
+		    }
+		 if (turnoActual >= cantClientes) {
+			    turnoActual = 0;
+			}
+		 
+		System.out.println(
+		        "[SERVIDOR] JUGAADOR_ELIMINADO ENVIADO -> jugador=" + idxJugador
+		    );
+		  eliminarClientePorIndice(idxJugador);
 	}
 
 
